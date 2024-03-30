@@ -1,0 +1,18 @@
+.flipped-icon {
+    transform: scaleX(-1);
+}
+
+.carousel {
+    display: flex;
+    overflow-x: auto;
+}
+
+.carousel-item {
+    flex: 0 0 auto;
+}
+
+.text-truncate {
+    white-space: nowrap;
+    overflow: hidden; 
+    text-overflow: ellipsis;
+  }

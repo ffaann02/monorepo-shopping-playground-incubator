@@ -1,0 +1,547 @@
+@mixin randomColor() 
+{
+    $hue: 359 * random();
+    background: hsl($hue,67%,50%);
+}
+
+@mixin configPrizes() {
+    $prizesPerLayer: 60;
+    @for $p from 1 through $prizesPerLayer {
+        .machine__prize:nth-child(#{$p}) {
+            @include randomColor();
+            top: 8em + (round(4 * random() * 10) / 10);
+            left: 0em + (round(14 * random() * 10) / 10);
+        }
+    }
+}
+
+.machine__crane-arm {
+	transition: transform 2s ease; /* Smooth transition for transform property */
+  }
+  
+  /* Define the animation for startPicking */
+  @keyframes startPicking {
+	0% {
+	  transform: translateY(-80px); /* Initial position */
+	}
+	100% {
+	  transform: translateY(0); /* Lowered position */
+	}
+  }
+  
+
+@keyframes pickAnimation {
+	0% {
+	  transform: translateY(-100px); /* Initial position */
+	}
+	100% {
+	  transform: translateY(0); /* Final position */
+	}
+  }
+  
+  .picking-animation {
+	animation: pickAnimation 1s linear forwards;
+  }
+
+
+.machine{
+	background: hsla(0,0%,100%,0.1);
+	border-radius: 0.25em;
+	box-shadow: -0.25em 0 0 hsla(0,0%,0%,0.25) inset, 0.25em 0 0 hsla(0,0%,100%,0.2) inset, 0 3.5em 0 inset, -1em 0 0 inset, 0 -18em 0 inset, 1em 0 0 inset, 0 -22em 0 hsla(0,0%,50%,0.3) inset;
+	color: hsl(223,90%,45%);
+	display: flex;
+	justify-content: center;
+	align-content: flex-start;
+	flex-wrap: wrap;
+	margin: 1.5em auto 1em auto;
+	width: 18em;
+	height: 34.5em;
+	input{
+		position: fixed;
+		top: -1.5em;
+		left: -1.5em;
+		&:checked {
+			~ .machine__btn {
+				filter: brightness(75%);
+				-webkit-filter: brightness(75%);
+				&:nth-child(6) {
+					animation: flash 1s 6s steps(1) infinite;
+					visibility: hidden;
+				}
+				&:nth-child(7) {
+					animation: disappear 1s 5s steps(1) forwards;
+					visibility: visible;
+				}
+				&:nth-child(n + 2):nth-child(-n + 5):active ~ .machine__window .machine__crane {
+					&-z {
+						transform: translateZ(-11.49em);
+					}
+					&-x {
+						transform: translateX(0.05em);
+					}
+					&-claw {
+						animation: {
+							name: swingClaw2;
+							duration: 0s;
+						};
+					}
+				}
+			}
+			~ .machine__window .machine__crane {
+				&-z, &-x {
+					transition: transform 2s 2.75s linear;
+				}
+				&-z {
+					transform: translateZ(-11.49em);
+				}
+				&-x {
+					transform: translateX(0.01em);
+				}
+				&-arm, &-claw, &-claw .machine__prize, &-finger, &-palm {
+					animation-duration: 5s;
+				}
+				&-arm, &-claw, &-finger, &-palm {
+					animation-timing-function: linear;
+				}
+				&-arm {
+					
+				}
+				&-claw {
+					animation-name: swingClaw2;
+					.machine__prize {
+						animation: {
+							name: liftPrize;
+							timing-function: ease-in;
+						};
+					}
+				}
+				&-finger {
+					&:first-child {
+						animation-name: grabA;
+					}
+					&:nth-child(2) {
+						animation-name: grabB;
+					}
+					&:nth-child(3) {
+						animation-name: grabC;
+					}
+				}
+				&-palm {
+					animation-name: raisePalm;
+				}
+			}
+		}
+		&:focus {
+			~ .machine__btn:nth-child(6) {
+				filter: brightness(125%);
+				-webkit-filter: brightness(125%);
+			}
+		}
+	}
+	&__btn, &__window, &__crane-z, &__crane-claw {
+		position: relative;
+	}
+	&__roof, &__window {
+		width: 16rem;
+	}
+	&__roof, &__btn span {
+		user-select: none;
+		-webkit-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+	}
+	&__btn {
+		background: hsl(223,90%,65%);
+		border-radius: 50%;
+		box-shadow: 0 0.375em 0 hsl(223,90%,55%);
+		color: hsl(0,0%,9%);
+		cursor: pointer;
+		display: block;
+		margin: 0 0.125em;
+		width: 3em;
+		height: 2.25em;
+		z-index: 1;
+		&:active {
+			box-shadow: 0 0 0 hsl(223,90%,55%);
+			transform: translateY(0.375em);
+			~ .machine__window .machine__crane &-z, &-x {
+				transition: transform 2s linear;
+			}
+		}
+		&:focus {
+			filter: brightness(125%);
+			-webkit-filter: brightness(125%);
+			outline: transparent;
+		}
+		&--red {
+			background: hsl(0,88%,65%);
+			box-shadow: 0 0.375em 0 hsl(0,89%,55%);
+			&:active {
+				box-shadow: 0 0 0 hsl(0,89%,55%);
+			}
+		}
+		&:nth-child(7), span {
+			position: absolute;
+		}
+		&:nth-child(7) {
+			top: 17.5em;
+			right: 0.875em;
+			visibility: hidden;
+		}
+		span {
+			display: inline-block;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%,-50%);
+		}
+		&:nth-child(2), &:nth-child(4) {
+			&:active ~ .machine__window .machine__crane-claw {
+				animation: swingClaw1 1s linear infinite reverse;
+			}
+		}
+		&:nth-child(3), &:nth-child(5) {
+			&:active ~ .machine__window .machine__crane-claw {
+				animation: swingClaw1 1s linear infinite;
+			}
+		}
+		&:nth-child(2):active ~ .machine__window .machine__crane-x {
+			transform: translateX(0.01em);
+		}
+		&:nth-child(3):active ~ .machine__window .machine__crane-x {
+			transform: translateX(11.5em);
+		}
+		&:nth-child(4):active ~ .machine__window .machine__crane-z {
+			transform: translateZ(-11.49em);
+		}
+		&:nth-child(5):active ~ .machine__window .machine__crane-z {
+			transform: translateZ(-0.01em);
+		}
+	}
+	
+	&__roof {
+		background: hsl(43,89%,55%);
+		color: hsl(44,97%,12%);
+		cursor: default;
+		font-size: 1.25em;
+		height: 2rem;
+		margin: 0.75rem;
+		padding-top: 0.2rem;
+		order: -2;
+	}
+	
+	&__window {
+		box-shadow: 0.25em 0 0 hsla(0,0%,100%,0.2), -0.25em 0 0 hsla(0,0%,0%,0.25);
+		height: 13em;
+		order: -1;
+		overflow: hidden;
+		margin-bottom: 1em;
+		perspective: 40em;
+		z-index: 1;
+	}
+	
+	&__crane-finger, &__crane-palm, &__prizes, &__prize {
+		position: absolute;
+	}
+	&__crane{
+		&-z, &-x {
+			transition: transform 1e4s linear;
+		}
+		&-z {
+			left: 0.75em;
+			transform: translateZ(-11.5em);
+			z-index: -3;
+		}
+		&-x {
+			width: 3em;
+			height: 14em;
+		}
+		&-arm {
+			background: linear-gradient(hsl(0,0%,59%),hsl(0,0%,59%)) (50% 0) / (0.25em 100%);
+			margin: auto;
+			width: 100%;
+			height: 10em;
+			transform: translateY(-8em);
+		}
+		&-claw {
+			background: linear-gradient(hsl(0,0%,59%),hsl(0,0%,59%)) (50% 1em) / (1.5em 0.25em), 
+						linear-gradient(-80deg,hsla(0,0%,59%,0) 38%,hsl(0,0%,59%) 41% 64%,hsla(0,0%,59%,0) 67%) (0.25em 1em) / (1em 2em), 
+						linear-gradient(80deg,hsla(0,0%,59%,0) 38%,hsl(0,0%,59%) 41% 64%,hsla(0,0%,59%,0) 67%) (1.75em 1em) / (1em 2em), 
+						linear-gradient(hsl(0,0%,39%),hsl(0,0%,39%)) (50% 0) / (1em 0.75em), 
+						linear-gradient(hsl(0,0%,34%),hsl(0,0%,34%)) (50% 0.75em) / (0.75em 1.5em), 
+						linear-gradient(hsl(0,0%,59%),hsl(0,0%,59%)) (50% 2.25em) / (0.5em 0.5em);
+			transform-origin: 50% 0;
+			top: 8em;
+			width: 100%;
+			height: 6em;
+		}
+		&-arm, &-claw {
+			background-repeat: no-repeat;
+		}
+		&-finger {
+			color: hsl(0, 0%, 59%);
+			top: 3em;
+			width: 1.5em;
+			height: 3em;
+			&:first-child, &:nth-child(3) {
+				border-top: 0.25em solid;
+			}
+			&:first-child {
+				border-radius: 100% 0 0 100% / 35% 0 0 50%;
+				border-left: 0.5em solid;
+				left: 0;
+				transform: rotate(30deg);
+				transform-origin: 100% 0;
+			}
+			&:nth-child(2) {
+				background: hsl(0,0%,49%);
+				border-radius: 0 0 50% 50% / 0 0 100% 100%;
+				left: calc(50% - 0.25em);
+				width: 0.5em;
+				transform: scaleY(0.67);
+				transform-origin: 50% 0;
+			}
+			&:nth-child(3) {
+				border-radius: 0 100% 100% 0 / 0 35% 50% 0;
+				border-right: 0.5em solid;
+				right: 0;
+				transform: rotate(-30deg);
+				transform-origin: 0 0;
+			}
+		}
+		&-palm {
+			background: hsl(0,0%,64%);
+			border-radius: 0.25em;
+			top: 2.75em;
+			left: calc(50% - 0.625em);
+			width: 1.25em;
+			height: 0.5em;
+		}
+	}
+	&__prizes {
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: -2;
+		.machine__prize {
+			opacity: 1;
+		}
+		@include configPrizes();
+		@for $c from 3 through 4 {
+			&:nth-child(#{$c}) {
+				@if $c > 3 {
+					transform: translateZ(-4em * ($c - 3));
+				}
+				z-index: -1 - $c;
+				@include configPrizes();
+			}
+		}
+	}
+	
+	&__prize {
+		@include randomColor();
+		border-radius: 50%;
+		box-shadow: -0.25em -0.25em 0 hsla(0,0%,0%,0.25) inset;
+		opacity: 0;
+		top: calc(100% - 2em);
+		left: calc(50% - 1em);
+		width: 2em;
+		height: 2em;
+	}
+	
+	&__op-area {
+		background: linear-gradient(90deg,hsl(0,0%,0%) 0.25em,transparent 0.25em 0.5em, hsl(43,73%,29%) 0.5em 1em,transparent 1em 7.5em,hsl(0,0%,0%) 7.5em 7.75em,transparent 7.75em 8em,hsl(43,73%,29%) 8em) (50% 5.25em) / (8.5em 1em), linear-gradient(90deg,hsl(0,0%,14%) 1.5em,transparent 1.5em 7.5em,hsl(0,0%,14%) 7.5em) (50% 5em) / (9em 1.5em), linear-gradient(90deg,hsl(0,0%,24%) 1em,transparent 1em 7.5em,hsl(0,0%,24%) 7.5em) (50% 7.5em) / (8.5em 1em), linear-gradient(90deg,hsl(0,0%,14%) 1.5em,transparent 1.5em 7.5em,hsl(0,0%,14%) 7.5em) (50% 7.25em) / (9em 1.5em);
+		background-repeat: no-repeat;
+		margin: -2.25em 0.5em 1em 0.5em;
+		width: 17em;
+		height: 12em;
+		&, &:before {
+			border: {
+				top: 1.5em solid hsl(43,89%,55%);
+				right: 0.25em solid hsla(0,0%,0%,0.25);
+				bottom: 1em solid hsla(0,0%,0%,0.3);
+				left: 0.25em solid hsla(0,0%,100%,0.2);
+			}
+		}
+		&:before {
+			content: "";
+			display: block;
+			margin: auto;
+			height: 1.5em;
+		}
+	}
+	
+	&__prize-door, &__vents {
+		width: 3em;
+		height: 3em;
+	}
+	
+	&__prize-door {
+		background: hsl(0,0%,59%);
+		border-radius: 0.375em;
+		box-shadow: 0.125em 0.125em 0 hsla(0,0%,0%,0.55) inset;
+		margin: 0 auto 0 1.5em;
+	}
+	
+	&__vents {
+		background: radial-gradient(100% 100% at center,hsl(0,0%,0%) 33%,transparent 35%) (0 0) / 25% 25%;
+		margin: 0 auto 0 0;
+	}
+	
+	&__feet {
+		background: linear-gradient(90deg,hsl(0,0%,64%) 2em,transparent 2em 15em,hsl(0,0%,64%) 15em) 0 100% / 100% 50%, linear-gradient(90deg,transparent 0.5em,hsl(0,0%,59%) 0.5em 1.5em,transparent 1.5em 15.5em,hsl(0,0%,59%) 15.5em 16.5em,transparent 16.5em);
+		background-repeat: no-repeat;
+		position: absolute;
+		top: 100%;
+		left: 0.5em;
+		width: 17em;
+		height: 1em;
+	}
+}
+
+.right-arrow, .down-arrow, .left-arrow, .up-arrow {
+	transition: transform 2s linear; /* Add transition property */
+	width: 0;
+	height: 0;
+}
+.right-arrow {
+	border: {
+		top: 0.5em solid transparent;
+		bottom: 0.5em solid transparent;
+		left: 1em solid;
+	}
+}
+.down-arrow {
+	border: {
+		top: 0.75em solid;
+		right: 0.75em solid transparent;
+		left: 0.75em solid transparent;
+	}
+}
+.left-arrow {
+	border: {
+		top: 0.5em solid transparent;
+		right: 1em solid;
+		bottom: 0.5em solid transparent;
+	}
+}
+.up-arrow {
+	border: {
+		right: 0.75em solid transparent;
+		bottom: 0.75em solid;
+		left: 0.75em solid transparent;
+	}
+}
+
+.sr {
+	clip: rect(1px,1px,1px,1px);
+	overflow: hidden;
+	width: 1px;
+	height: 1px;
+}
+
+/* Animation */
+@keyframes lowerArm {
+	from, 50%, to {
+		transform: translateY(-8em);
+	}
+	20%, 30% {
+		transform: translateY(-1em);
+	}
+}
+@keyframes swingClaw1 {
+	from, to {
+		transform: rotate(0deg);
+	}
+	25% {
+		transform: rotate(10deg);
+	}
+	75% {
+		transform: rotate(-10deg);
+	}
+}
+@keyframes swingClaw2 {
+	from, 20%, 30%, 50%, to {
+		transform: rotate(0deg);
+	}
+	5%, 35% {
+		transform: rotate(5deg);
+	}
+	15%, 45% {
+		transform: rotate(-5deg);
+	}
+}
+@keyframes grabA {
+	from, 20%, to {
+		transform: translateY(0) rotate(30deg);
+	}
+	25%, 95% {
+		transform: translateY(-0.5em) rotate(0);
+	}
+}
+@keyframes grabB {
+	from, 20%, to {
+		transform: translateY(0) scaleY(0.67);
+	}
+	25%, 95% {
+		transform: translateY(-0.5em) scaleY(1);
+	}
+}
+@keyframes grabC {
+	from, 20%, to {
+		transform: translateY(0) rotate(-30deg);
+	}
+	25%, 95% {
+		transform: translateY(-0.5em) rotate(0);
+	}
+}
+@keyframes raisePalm {
+	from, 20%, to {
+		transform: translateY(0);
+	}
+	25%, 95% {
+		transform: translateY(-0.5em);
+	}
+}
+@keyframes liftPrize {
+	from, 20% {
+		opacity: 0;
+		transform: translate(0,0);
+	}
+	20.1% {
+		opacity: 1;
+		transform: translate(0,0);
+	}
+	25%, 45% {
+		opacity: 1;
+		transform: translate(0,-0.75em);
+	}
+	50% {
+		opacity: 1;
+		transform: translate(-0.125em,6em);
+	}
+	50.1%, to {
+		opacity: 0;
+		transform: translate(-0.125em,6em);
+	}
+}
+@keyframes disappear {
+	from {
+		visibility: visible;
+	}
+	to {
+		visibility: hidden;
+	}
+}
+@keyframes flash {
+	from, to {
+		visibility: visible;
+		filter: brightness(100%);
+		-webkit-filter: brightness(100%);
+	}
+	50% {
+		visibility: visible;
+		filter: brightness(75%);
+		-webkit-filter: brightness(75%);
+	}
+}
